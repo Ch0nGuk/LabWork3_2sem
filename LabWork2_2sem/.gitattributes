@@ -1,0 +1,9 @@
+* text=auto
+*.h text eol=lf
+*.hpp text eol=lf
+*.c text eol=lf
+*.cpp text eol=lf
+*.cc text eol=lf
+*.txt text eol=lf
+*.md text eol=lf
+.gitignore text eol=lf

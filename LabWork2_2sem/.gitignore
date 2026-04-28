@@ -1,0 +1,30 @@
+# Игнорировать папку с настройками VS Code
+.vscode/
+
+# Игнорировать все файлы с расширением .exe
+*.exe
+
+*.o
+*.obj
+*.pdb
+*.ilk
+*.idb
+*.lib
+*.exp
+*.out
+
+# (Опционально) Игнорировать временные папки компиляторов (если есть)
+bin/
+obj/
+
+program
+compile_check
+compile_check.*
+build_out.txt
+lab2_text.txt
+lab_app
+lab_app.exe
+lab_app_check
+lab_app_check.exe
+
+__tmp_compare_repo2/
