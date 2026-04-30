@@ -1,7 +1,7 @@
-#include "ui/ui.h"
+#include "tests.h"
 
 int main()
 {
-    RunUi();
+    RunAllTests();
     return 0;
 }

@@ -11,6 +11,8 @@ private:
     X right;
 
 public:
+    Interval() : left(X()), right(X()) {}
+
     Interval(const X& left_arg, const X& right_arg) : left(left_arg), right(right_arg)
     {
         if (right_arg < left_arg)

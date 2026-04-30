@@ -1,7 +1,6 @@
 #pragma once
 
 #include <cmath>
-#include <memory>
 
 #include "IFunction.h"
 
@@ -34,9 +33,9 @@ public:
         return Monotonicity::Increasing;
     }
 
-    std::unique_ptr<IFunction<X, X>> Clone() const override
+    UniquePtr<IFunction<X, X>> Clone() const override
     {
-        return std::make_unique<ExpFunction<X>>(*this);
+        return UniquePtr<IFunction<X, X>>(new ExpFunction<X>(*this));
     }
 };
 

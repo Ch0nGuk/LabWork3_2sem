@@ -1,7 +1,6 @@
 #pragma once
 
 #include <cmath>
-#include <memory>
 
 #include "IFunction.h"
 
@@ -74,9 +73,9 @@ public:
         return Monotonicity::NotMonotone;
     }
 
-    std::unique_ptr<IFunction<X, X>> Clone() const override
+    UniquePtr<IFunction<X, X>> Clone() const override
     {
-        return std::make_unique<SinFunction<X>>(*this);
+        return UniquePtr<IFunction<X, X>>(new SinFunction<X>(*this));
     }
 };
 

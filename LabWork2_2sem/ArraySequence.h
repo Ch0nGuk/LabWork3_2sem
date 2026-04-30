@@ -1,8 +1,7 @@
 #ifndef ARRAY_SEQUENCE_H
 #define ARRAY_SEQUENCE_H
 
-#include <memory>
-
+#include "../UniquePtr.h"
 #include "Sequence.h"
 #include "DynamicArray.h"
 #include "ListSequence.h"
@@ -172,7 +171,7 @@ public:
     Sequence<T>* Where(bool (*predicate)(T)) const override
     {
         int new_size = 0;
-        std::unique_ptr<IEnumerator<T>> enumerator(this->GetEnumerator());
+        UniquePtr<IEnumerator<T>> enumerator(this->GetEnumerator());
 
         while (enumerator->MoveNext())
         {

@@ -52,8 +52,8 @@ public:
         return Monotonicity::NotMonotone;
     }
 
-    std::unique_ptr<IFunction<X, X>> Clone() const override
+    UniquePtr<IFunction<X, X>> Clone() const override
     {
-        return std::make_unique<InverseSquareFunction<X>>(*this);
+        return UniquePtr<IFunction<X, X>>(new InverseSquareFunction<X>(*this));
     }
 };

@@ -1,8 +1,7 @@
 #ifndef LIST_SEQUENCE_H
 #define LIST_SEQUENCE_H
 
-#include <memory>
-
+#include "../UniquePtr.h"
 #include "Sequence.h"
 #include "LinkedList.h"
 #include "IEnumerator.h"
@@ -71,7 +70,7 @@ public:
     Sequence<T>* Concat(const Sequence<T>& other) const override
     {
         LinkedList<T> other_list;
-        std::unique_ptr<IEnumerator<T>> enumerator(other.GetEnumerator());
+        UniquePtr<IEnumerator<T>> enumerator(other.GetEnumerator());
 
         while (enumerator->MoveNext())
         {
@@ -90,7 +89,7 @@ public:
         }
 
         LinkedList<T> new_list;
-        std::unique_ptr<IEnumerator<T>> enumerator(this->GetEnumerator());
+        UniquePtr<IEnumerator<T>> enumerator(this->GetEnumerator());
         int index = 0;
 
         while (enumerator->MoveNext())
@@ -114,8 +113,8 @@ public:
         }
 
         LinkedList<T> new_list;
-        std::unique_ptr<IEnumerator<T>> source_enumerator(this->GetEnumerator());
-        std::unique_ptr<IEnumerator<T>> replacement_enumerator(replacement.GetEnumerator());
+        UniquePtr<IEnumerator<T>> source_enumerator(this->GetEnumerator());
+        UniquePtr<IEnumerator<T>> replacement_enumerator(replacement.GetEnumerator());
         bool inserted_replacement = false;
         int index = 0;
 
@@ -153,7 +152,7 @@ public:
     Sequence<T>* Where(bool (*predicate)(T)) const override
     {
         LinkedList<T> new_list;
-        std::unique_ptr<IEnumerator<T>> enumerator(this->GetEnumerator());
+        UniquePtr<IEnumerator<T>> enumerator(this->GetEnumerator());
 
         while (enumerator->MoveNext())
         {

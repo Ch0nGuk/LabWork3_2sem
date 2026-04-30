@@ -1,7 +1,5 @@
 #pragma once
 
-#include <memory>
-
 #include "IFunction.h"
 
 // f(x) = x^4 - 3x^3 + 7x
@@ -51,9 +49,9 @@ public:
         return Monotonicity::NotMonotone;
     }
 
-    std::unique_ptr<IFunction<X, X>> Clone() const override
+    UniquePtr<IFunction<X, X>> Clone() const override
     {
-        return std::make_unique<Polynomial4Function<X>>(*this);
+        return UniquePtr<IFunction<X, X>>(new PolynomialFunction<X>(*this));
     }
 };
 

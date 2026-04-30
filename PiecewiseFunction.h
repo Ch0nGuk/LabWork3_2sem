@@ -1,7 +1,7 @@
 #pragma once
 
-#include <memory>
 #include <stdexcept>
+#include <utility>
 
 #include "Interval.h"
 #include "IFunction.h"
@@ -14,14 +14,68 @@ class PiecewiseFunction
 private:
     MutableArraySequence<Piece<X, Y>> pieces_;
 
+    static Monotonicity MergeMonotonicity(Monotonicity current, Monotonicity next)
+    {
+        if (current == Monotonicity::NotMonotone || next == Monotonicity::NotMonotone)
+        {
+            return Monotonicity::NotMonotone;
+        }
+
+        if (current == Monotonicity::Constant)
+        {
+            return next;
+        }
+
+        if (next == Monotonicity::Constant)
+        {
+            return current;
+        }
+
+        if (current == next)
+        {
+            return current;
+        }
+
+        return Monotonicity::NotMonotone;
+    }
+
+    void ValidateStructure() const
+    {
+        const int count = pieces_.GetLength();
+        for (int i = 0; i + 1 < count; i++)
+        {
+            const Interval<X>& current = pieces_.Get(i).GetInterval();
+            const Interval<X>& next = pieces_.Get(i + 1).GetInterval();
+
+            if (current.GetRight() > next.GetLeft())
+            {
+                throw std::logic_error("PiecewiseFunction: intervals overlap");
+            }
+        }
+    }
+
     int FindPieceIndexContaining(const X& x) const
     {
-        for (int i = pieces_.GetLength() - 1; i >= 0; i--)
+        const int count = pieces_.GetLength();
+        for (int i = 0; i < count; i++)
         {
-            if (pieces_.Get(i).GetInterval().Contains(x))
+            const Interval<X>& interval = pieces_.Get(i).GetInterval();
+            if (!interval.Contains(x))
             {
-                return i;
+                continue;
             }
+
+            const int right_index = i + 1;
+            if (right_index < count)
+            {
+                const Interval<X>& right_interval = pieces_.Get(right_index).GetInterval();
+                if (right_interval.Contains(x))
+                {
+                    return right_index;
+                }
+            }
+
+            return i;
         }
         return -1;
     }
@@ -34,6 +88,7 @@ public:
     PiecewiseFunction& operator=(const PiecewiseFunction& other)
     {
         pieces_ = other.pieces_;
+        return *this;
     }
 
     PiecewiseFunction(PiecewiseFunction&&) noexcept = default;
@@ -80,159 +135,228 @@ public:
 
     void Define(const Interval<X>& interval, const IFunction<X, Y>& function)
     {
-        MutableArraySequence<Piece<X, Y>> new_pieces;
-        int n = pieces_.GetLength();
+        MutableArraySequence<Piece<X, Y>> result;
+        const int n = pieces_.GetLength();
+        bool inserted = false;
+
         for (int i = 0; i < n; i++)
         {
             const Piece<X, Y>& piece = pieces_.Get(i);
-            const Interval<X>& old_i = piece.GetInterval();
+            const Interval<X>& old_interval = piece.GetInterval();
 
-            auto intersection = old_i.Intersection(interval);
-            if (!intersection.has_value())
+            if (old_interval.GetRight() < interval.GetLeft())
             {
-                new_pieces.Append(piece);
+                result.Append(piece);
                 continue;
             }
 
-            if (old_i.GetLeft() < interval.GetLeft())
+            if (old_interval.GetLeft() > interval.GetRight())
             {
-                Interval<X> left_rem(old_i.GetLeft(), interval.GetLeft());
-                new_pieces.Append(Piece<X, Y>(left_rem, piece.GetFunction().Clone()));
+                if (!inserted)
+                {
+                    result.Append(Piece<X, Y>(interval, function.Clone()));
+                    inserted = true;
+                }
+
+                result.Append(piece);
+                continue;
             }
 
-            if (old_i.GetRight() > interval.GetRight())
+            if (old_interval.GetLeft() < interval.GetLeft())
             {
-                Interval<X> right_rem(interval.GetRight(), old_i.GetRight());
-                new_pieces.Append(Piece<X, Y>(right_rem, piece.GetFunction().Clone()));
+                const Interval<X> left_remainder(old_interval.GetLeft(), interval.GetLeft());
+                result.Append(Piece<X, Y>(left_remainder, piece.GetFunction().Clone()));
+            }
+
+            if (!inserted)
+            {
+                result.Append(Piece<X, Y>(interval, function.Clone()));
+                inserted = true;
+            }
+
+            if (old_interval.GetRight() > interval.GetRight())
+            {
+                const Interval<X> right_remainder(interval.GetRight(), old_interval.GetRight());
+                result.Append(Piece<X, Y>(right_remainder, piece.GetFunction().Clone()));
             }
         }
 
-        Piece<X, Y> new_piece(interval, function.Clone());
-
-        const int m = new_pieces.GetLength();
-        int insert_pos = m;
-        for (int i = 0; i < m; i++)
+        if (!inserted)
         {
-            if (interval.GetLeft() < new_pieces.Get(i).GetInterval().GetLeft())
-            {
-                insert_pos = i;
-                break;
-            }
+            result.Append(Piece<X, Y>(interval, function.Clone()));
         }
 
-        MutableArraySequence<Piece<X, Y>> final_pieces;
-        for (int i = 0; i < insert_pos; i++)
-        {
-            final_pieces.Append(new_pieces.Get(i));
-        }
-        final_pieces.Append(new_piece);
-        for (int i = insert_pos; i < m; i++)
-        {
-            final_pieces.Append(new_pieces.Get(i));
-        }
-
-        pieces_ = std::move(final_pieces);
+        pieces_ = std::move(result);
+        ValidateStructure();
     }
 
     bool IsContinuousOn(const Interval<X>& interval) const
     {
-        int n = pieces_.GetLength();
-        bool has_any = false;
-        int prev_index = -1;
+        const int count = pieces_.GetLength();
+        bool has_coverage = false;
+        X covered_right = interval.GetLeft();
+        int previous_piece_index = -1;
 
-        for (int i = 0; i < n; i++)
+        for (int i = 0; i < count; i++)
         {
             const Interval<X>& piece_interval = pieces_.Get(i).GetInterval();
-            auto inter = piece_interval.Intersection(interval);
-            if (!inter.has_value())
+            const auto intersection = piece_interval.Intersection(interval);
+            if (!intersection.has_value())
             {
                 continue;
             }
 
-            has_any = true;
-            const IFunction<X, Y>& f = pieces_.Get(i).GetFunction();
-            if (!f.IsContinuousOn(inter.value()))
+            const Interval<X>& covered_part = intersection.value();
+            const IFunction<X, Y>& function = pieces_.Get(i).GetFunction();
+            if (!function.IsContinuousOn(covered_part))
             {
                 return false;
             }
 
-            if (prev_index >= 0)
+            if (!has_coverage)
             {
-                // Check continuity at the junction point if intervals touch.
-                const Interval<X>& prev_int = pieces_.Get(prev_index).GetInterval();
-                const Interval<X>& cur_int = piece_interval;
-
-                // Touching at x0 if prev.right == cur.left.
-                if (prev_int.GetRight() == cur_int.GetLeft())
+                if (covered_part.GetLeft() != interval.GetLeft()) // проверка на первое пересечение и дыру между левыми границами
                 {
-                    const X x0 = cur_int.GetLeft();
-                    const IFunction<X, Y>& f_left = pieces_.Get(prev_index).GetFunction();
-                    const IFunction<X, Y>& f_right = f;
+                    return false;
+                }
 
-                    const bool left_defined = f_left.IsDefinedOn(Interval<X>(x0, x0));
-                    const bool right_defined = f_right.IsDefinedOn(Interval<X>(x0, x0));
-                    if (left_defined && right_defined)
-                    {
-                        if (!(f_left.Evaluate(x0) == f_right.Evaluate(x0)))
-                        {
-                            return false;
-                        }
-                    }
-                    else
-                    {
-                        // If one side isn't defined at the border point, treat as discontinuity on a closed interval.
-                        return false;
-                    }
+                has_coverage = true;
+                covered_right = covered_part.GetRight();
+                previous_piece_index = i;
+                continue;
+            }
+
+            if (covered_part.GetLeft() > covered_right)
+            {
+                return false;
+            }
+
+            const Piece<X, Y>& previous_piece = pieces_.Get(previous_piece_index);
+            const Interval<X>& previous_interval = previous_piece.GetInterval();
+            if (previous_interval.GetRight() == piece_interval.GetLeft())
+            {
+                const X junction = piece_interval.GetLeft(); // осхраняется точка стыка 
+                const IFunction<X, Y>& previous_function = previous_piece.GetFunction(); // функция из предыдущего куска    
+
+                if (!previous_function.IsDefinedOn(Interval<X>(junction, junction)) ||
+                    !function.IsDefinedOn(Interval<X>(junction, junction))) // обе функции определены в точке (иначе разрыв)
+                {
+                    return false;
+                }
+
+                if (!(previous_function.Evaluate(junction) == function.Evaluate(junction))) // проверка совпадений значений
+                {
+                    return false;
                 }
             }
 
-            prev_index = i;
+            if (covered_part.GetRight() > covered_right) // смещение границы покрытия 
+            {
+                covered_right = covered_part.GetRight();
+            }
+
+            previous_piece_index = i;
         }
 
-        if (!has_any)
+        if (!has_coverage)
         {
-            // No pieces intersect interval => not continuous "as a function on that interval"
             return false;
         }
 
-        return true;
+        return covered_right >= interval.GetRight();
     }
 
     Monotonicity GetMonotonicityOn(const Interval<X>& interval) const
     {
-        const int n = pieces_.GetLength();
-        bool has_any = false;
+        if (interval.GetLeft() == interval.GetRight())
+        {
+            return IsDefinedAt(interval.GetLeft()) ? Monotonicity::Constant : Monotonicity::NotMonotone;
+        }
 
+        const int count = pieces_.GetLength();
+        bool has_coverage = false;
+        X covered_right = interval.GetLeft();
+        int previous_piece_index = -1;
         Monotonicity overall = Monotonicity::Constant;
 
-        for (int i = 0; i < n; i++)
+        for (int i = 0; i < count; i++)
         {
             const Interval<X>& piece_interval = pieces_.Get(i).GetInterval();
-            auto inter = piece_interval.Intersection(interval);
-            if (!inter.has_value())
+            const auto intersection = piece_interval.Intersection(interval);
+            if (!intersection.has_value())
             {
                 continue;
             }
 
-            has_any = true;
-            const IFunction<X, Y>& f = pieces_.Get(i).GetFunction();
-            const Monotonicity m = f.GetMonotonicityOn(inter.value());
-            if (m == Monotonicity::NotMonotone)
+            const Interval<X>& covered_part = intersection.value();
+            const IFunction<X, Y>& function = pieces_.Get(i).GetFunction();
+            const Monotonicity local = function.GetMonotonicityOn(covered_part);
+            overall = MergeMonotonicity(overall, local);
+            if (overall == Monotonicity::NotMonotone)
             {
                 return Monotonicity::NotMonotone;
             }
 
-            if (overall == Monotonicity::Constant)
+            if (!has_coverage)
             {
-                overall = m;
+                if (covered_part.GetLeft() != interval.GetLeft())
+                {
+                    return Monotonicity::NotMonotone;
+                }
+
+                has_coverage = true;
+                covered_right = covered_part.GetRight();
+                previous_piece_index = i;
+                continue;
             }
-            else if (overall != m)
+
+            if (covered_part.GetLeft() > covered_right)
             {
                 return Monotonicity::NotMonotone;
             }
+
+            const Piece<X, Y>& previous_piece = pieces_.Get(previous_piece_index);
+            const Interval<X>& previous_interval = previous_piece.GetInterval();
+            if (previous_interval.GetRight() == piece_interval.GetLeft())
+            {
+                const X junction = piece_interval.GetLeft();
+                const IFunction<X, Y>& previous_function = previous_piece.GetFunction();
+
+                if (!previous_function.IsDefinedOn(Interval<X>(junction, junction)) ||
+                    !function.IsDefinedOn(Interval<X>(junction, junction)))
+                {
+                    return Monotonicity::NotMonotone;
+                }
+
+                const Y previous_value = previous_function.Evaluate(junction);
+                const Y current_value = function.Evaluate(junction);
+
+                Monotonicity junction_trend = Monotonicity::Constant;
+                if (previous_value < current_value)
+                {
+                    junction_trend = Monotonicity::Increasing;
+                }
+                else if (previous_value > current_value)
+                {
+                    junction_trend = Monotonicity::Decreasing;
+                }
+
+                overall = MergeMonotonicity(overall, junction_trend);
+                if (overall == Monotonicity::NotMonotone)
+                {
+                    return Monotonicity::NotMonotone;
+                }
+            }
+
+            if (covered_part.GetRight() > covered_right)
+            {
+                covered_right = covered_part.GetRight();
+            }
+
+            previous_piece_index = i;
         }
 
-        if (!has_any)
+        if (!has_coverage || covered_right < interval.GetRight())
         {
             return Monotonicity::NotMonotone;
         }

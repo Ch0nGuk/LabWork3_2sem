@@ -1,0 +1,45 @@
+*
+
+# Keep repository metadata/config that belongs to the project.
+!/.gitignore
+!/.gitattributes
+
+# Keep root lab implementation files.
+!/*.c
+!/*.cc
+!/*.cpp
+!/*.cxx
+!/*.h
+!/*.hpp
+!/*.hh
+!/*.hxx
+!/*.inl
+!/*.ipp
+!/Makefile
+!/CMakeLists.txt
+
+# Keep previous lab sources that are part of the repo.
+!/LabWork2_2sem/
+/LabWork2_2sem/*
+!/LabWork2_2sem/.gitignore
+!/LabWork2_2sem/.gitattributes
+!/LabWork2_2sem/Makefile
+!/LabWork2_2sem/CMakeLists.txt
+!/LabWork2_2sem/*.c
+!/LabWork2_2sem/*.cc
+!/LabWork2_2sem/*.cpp
+!/LabWork2_2sem/*.cxx
+!/LabWork2_2sem/*.h
+!/LabWork2_2sem/*.hpp
+!/LabWork2_2sem/*.hh
+!/LabWork2_2sem/*.hxx
+!/LabWork2_2sem/*.inl
+!/LabWork2_2sem/*.ipp
+
+# Explicitly ignore common local/build artifacts.
+.vscode/
+*.obj
+*.exe
+*.txt
+*.pdf
+$null

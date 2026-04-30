@@ -1,7 +1,7 @@
 #pragma once
 
-#include <memory>
 #include <stdexcept>
+#include <utility>
 #include "Interval.h"
 #include "IFunction.h"
 
@@ -10,10 +10,12 @@ class Piece
 {
 private:
     Interval<X> interval;
-    std::unique_ptr<IFunction<X, Y>> function;
+    UniquePtr<IFunction<X, Y>> function;
 
 public:
-    Piece(const Interval<X>& interval_arg, std::unique_ptr<IFunction<X, Y>> function_arg)
+    Piece() : interval(), function(nullptr) {}
+
+    Piece(const Interval<X>& interval_arg, UniquePtr<IFunction<X, Y>> function_arg)
         : interval(interval_arg), function(std::move(function_arg))
     {
         if (!function)

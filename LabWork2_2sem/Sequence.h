@@ -1,8 +1,7 @@
 #ifndef SEQUENCE_H
 #define SEQUENCE_H
 
-#include <memory>
-
+#include "../UniquePtr.h"
 #include "IEnumerator.h"
 
 template <typename T>
@@ -31,7 +30,7 @@ public:
     T Reduce(T (*func)(T, T), T start_value) const
     {
         T result = start_value;
-        std::unique_ptr<IEnumerator<T>> enumerator(GetEnumerator());
+        UniquePtr<IEnumerator<T>> enumerator(GetEnumerator());
 
         while (enumerator->MoveNext())
         {

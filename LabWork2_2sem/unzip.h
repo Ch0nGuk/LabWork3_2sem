@@ -1,9 +1,9 @@
 #ifndef UNZIP_H
 #define UNZIP_H
 
-#include <memory>
 #include <utility>
 
+#include "../UniquePtr.h"
 #include "IEnumerator.h"
 #include "Sequence.h"
 #include "sequence_factory.h"
@@ -14,9 +14,9 @@ std::pair<Sequence<T1>*, Sequence<T2>*> Unzip(
     const SequenceFactory<T1>& first_factory,
     const SequenceFactory<T2>& second_factory)
 {
-    std::unique_ptr<Sequence<T1>> first_result(first_factory.Create());
-    std::unique_ptr<Sequence<T2>> second_result(second_factory.Create());
-    std::unique_ptr<IEnumerator<std::pair<T1, T2>>> enumerator(source.GetEnumerator());
+    UniquePtr<Sequence<T1>> first_result(first_factory.Create());
+    UniquePtr<Sequence<T2>> second_result(second_factory.Create());
+    UniquePtr<IEnumerator<std::pair<T1, T2>>> enumerator(source.GetEnumerator());
 
     while (enumerator->MoveNext())
     {

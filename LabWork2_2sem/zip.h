@@ -1,9 +1,9 @@
 #ifndef ZIP_H
 #define ZIP_H
 
-#include <memory>
 #include <utility>
 
+#include "../UniquePtr.h"
 #include "IEnumerator.h"
 #include "Sequence.h"
 #include "sequence_factory.h"
@@ -14,9 +14,9 @@ Sequence<std::pair<T1, T2>>* Zip(
     const Sequence<T2>& second,
     const SequenceFactory<std::pair<T1, T2>>& factory)
 {
-    std::unique_ptr<Sequence<std::pair<T1, T2>>> result(factory.Create());
-    std::unique_ptr<IEnumerator<T1>> first_enumerator(first.GetEnumerator());
-    std::unique_ptr<IEnumerator<T2>> second_enumerator(second.GetEnumerator());
+    UniquePtr<Sequence<std::pair<T1, T2>>> result(factory.Create());
+    UniquePtr<IEnumerator<T1>> first_enumerator(first.GetEnumerator());
+    UniquePtr<IEnumerator<T2>> second_enumerator(second.GetEnumerator());
 
     while (first_enumerator->MoveNext() && second_enumerator->MoveNext())
     {
