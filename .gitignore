@@ -18,6 +18,20 @@
 !/Makefile
 !/CMakeLists.txt
 
+# Keep lab 3 console UI sources.
+!/ui/
+/ui/*
+!/ui/*.c
+!/ui/*.cc
+!/ui/*.cpp
+!/ui/*.cxx
+!/ui/*.h
+!/ui/*.hpp
+!/ui/*.hh
+!/ui/*.hxx
+!/ui/*.inl
+!/ui/*.ipp
+
 # Keep previous lab sources that are part of the repo.
 !/LabWork2_2sem/
 /LabWork2_2sem/*

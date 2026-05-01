@@ -27,7 +27,7 @@ public:
         {
             return Monotonicity::Constant;
         }
-        return Monotonicity::Increasing; // slope = 5 > 0
+        return Monotonicity::Increasing; 
     }
 
     UniquePtr<IFunction<X, X>> Clone() const override

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <stdexcept>
+#include <typeinfo>
 #include <utility>
 
 #include "Interval.h"
@@ -52,6 +53,41 @@ private:
                 throw std::logic_error("PiecewiseFunction: intervals overlap");
             }
         }
+    }
+
+    MutableArraySequence<Piece<X, Y>> MergeAdjacentEquivalentPieces(const MutableArraySequence<Piece<X, Y>>& pieces) const
+    {
+        MutableArraySequence<Piece<X, Y>> merged;
+        const int count = pieces.GetLength();
+        if (count == 0)
+        {
+            return merged;
+        }
+
+        Piece<X, Y> current = pieces.Get(0);
+
+        for (int i = 1; i < count; i++)
+        {
+            const Piece<X, Y>& next = pieces.Get(i);
+            const Interval<X>& current_interval = current.GetInterval();
+            const Interval<X>& next_interval = next.GetInterval();
+
+            const bool touches = current_interval.GetRight() == next_interval.GetLeft();
+            const bool same_function_type = typeid(current.GetFunction()) == typeid(next.GetFunction());
+            if (touches && same_function_type)
+            {
+                current = Piece<X, Y>(
+                    Interval<X>(current_interval.GetLeft(), next_interval.GetRight()),
+                    current.GetFunction().Clone());
+                continue;
+            }
+
+            merged.Append(current);
+            current = next;
+        }
+
+        merged.Append(current);
+        return merged;
     }
 
     int FindPieceIndexContaining(const X& x) const
@@ -186,7 +222,7 @@ public:
             result.Append(Piece<X, Y>(interval, function.Clone()));
         }
 
-        pieces_ = std::move(result);
+        pieces_ = MergeAdjacentEquivalentPieces(result);
         ValidateStructure();
     }
 

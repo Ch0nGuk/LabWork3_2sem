@@ -19,7 +19,6 @@ private:
         const X start = (l - pi / static_cast<X>(2)) / pi;
         const X end = (r - pi / static_cast<X>(2)) / pi;
 
-        // Any integer k strictly between start and end implies a critical point in (l, r).
         const long long k_min = static_cast<long long>(std::floor(start)) + 1;
         const long long k_max = static_cast<long long>(std::ceil(end)) - 1;
         return k_min <= k_max;
