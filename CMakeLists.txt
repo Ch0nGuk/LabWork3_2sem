@@ -5,32 +5,47 @@ set(CMAKE_CXX_STANDARD 17)
 
 # Ищем GLFW (уже установлен в системе)
 find_package(glfw3 REQUIRED)
+find_package(OpenGL REQUIRED)
+find_package(Threads REQUIRED)
+
 
 # Подключаем пути к заголовкам
-include_directories(headers external/imgui external/imgui/backends external/implot)
+include_directories(. External/imgui External/imgui/backends External/implot)
 
 # Собираем список всех исходников
 set(SOURCES
+    ui/continuity_ui.cpp
+    ui/create_function_ui.cpp
+    ui/define_piece_ui.cpp
+    ui/evaluate_ui.cpp
+    ui/monotonicity_ui.cpp
+    ui/piecewise_ui_utils.cpp
+    ui/print_functions_ui.cpp
+    ui/run_tests_ui.cpp
+    ui/ui.cpp
+    ui/plot_ui.cpp
     main.cpp
-    ui.cpp
-    piecewise_ui_utils.cpp
-    
-    # Добавьте сюда все остальные ваши cpp файлы (create_function_ui.cpp и т.д.)
+    tests.cpp
     
     # Исходники ImGui
-    external/imgui/imgui.cpp
-    external/imgui/imgui_draw.cpp
-    external/imgui/imgui_widgets.cpp
-    external/imgui/imgui_tables.cpp
-    external/imgui/backends/imgui_impl_glfw.cpp
-    external/imgui/backends/imgui_impl_opengl3.cpp
+    External/imgui/imgui.cpp
+    External/imgui/imgui_draw.cpp
+    External/imgui/imgui_widgets.cpp
+    External/imgui/imgui_tables.cpp
+    External/imgui/backends/imgui_impl_glfw.cpp
+    External/imgui/backends/imgui_impl_opengl3.cpp
     
     # Исходники ImPlot
-    external/implot/implot.cpp
-    external/implot/implot_items.cpp
+    External/implot/implot.cpp
+    External/implot/implot_items.cpp
 )
 
 add_executable(LabApp ${SOURCES})
 
 # Линковка
-target_link_libraries(LabApp glfw OpenGL::GL)
+target_link_libraries(LabApp 
+    glfw 
+    ${OPENGL_LIBRARIES} 
+    Threads::Threads
+    ${CMAKE_DL_LIBS}
+)
