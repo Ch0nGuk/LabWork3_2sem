@@ -43,6 +43,16 @@ public:
 
     virtual ArraySequence<T>* Instance() override = 0;
 
+    T& operator[](int index) 
+    {
+    return const_cast<T&>(this->data.Get(index));
+    }
+
+    const T& operator[](int index) const 
+    {
+        return this->data.Get(index);
+    }
+
     const T& GetFirst() const override
     {
         return data.Get(0);
@@ -58,6 +68,10 @@ public:
     int GetLength() const override
     {
         return data.GetSize();
+    }
+
+    const T* GetData() const {
+        return &this->data.Get(0); 
     }
 
     Sequence<T>* Append(const T& item) override

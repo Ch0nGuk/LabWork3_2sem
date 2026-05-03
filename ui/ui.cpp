@@ -11,6 +11,7 @@
 #include "print_functions_ui.h"
 #include "run_tests_ui.h"
 #include "ui_state.h"
+#include "plot_ui.h"
 
 namespace
 {
@@ -24,6 +25,7 @@ namespace
         std::cout << "5. Check monotonicity\n";
         std::cout << "6. Check continuity\n";
         std::cout << "7. Run tests\n";
+        std::cout << "8. Build plot\n";
         std::cout << "0. Exit\n";
     }
 }
@@ -72,6 +74,9 @@ void RunUi()
             break;
         case 7:
             RunTestsInUi();
+            break;
+        case 8:
+            PlotFunctionInUi(state);
             break;
         case 0:
             should_exit = true;
