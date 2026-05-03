@@ -17,6 +17,7 @@
 !/*.ipp
 !/Makefile
 !/CMakeLists.txt
+!/README.md
 
 # Keep lab 3 console UI sources.
 !/ui/
