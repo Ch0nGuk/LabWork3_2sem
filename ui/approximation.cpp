@@ -185,7 +185,6 @@ void ApproximateFunction(UiState& state)
         state.functions.push_back(approximation);
 
         std::cout << "Approximation created as function #" << state.functions.size() << ".\n";
-        PrintFunction(state.functions.back());
     }
     catch (const std::exception& error)
     {
