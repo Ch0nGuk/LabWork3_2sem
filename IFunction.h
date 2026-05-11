@@ -14,5 +14,9 @@ public:
     virtual bool IsDefinedOn(const Interval<X>& interval) const = 0;
     virtual bool IsContinuousOn(const Interval<X>& interval) const = 0;
     virtual Monotonicity GetMonotonicityOn(const Interval<X>& interval) const = 0;
+    virtual bool CanMergeWithSameType() const
+    {
+        return false;
+    }
     virtual UniquePtr<IFunction<X, Y>> Clone() const = 0;
 };

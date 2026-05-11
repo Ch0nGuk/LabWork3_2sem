@@ -1,51 +1,43 @@
-### Linux
+# PiecewiseLab
 
-1) **Установка зависимостей**
+Проект собирается с локальными копиями UI-зависимостей:
+
+- `External/imgui`
+- `External/implot`
+- `External/glfw`
+
+Системный пакет GLFW устанавливать не нужно.
+
+## Windows
+
+Требуется:
+
+- CMake
+- Visual Studio 2022 или Visual Studio Build Tools с компонентом C++
+
+Сборка из корня проекта:
+
+```cmd
+cmake -S . -B build
+cmake --build build --config Release
+build\Release\LabApp.exe
+```
+
+## Linux
+
+Требуется:
+
+- CMake
+- C++17 compiler
+- системные OpenGL/X11 development libraries
+
+Пример для Ubuntu/Debian:
 
 ```bash
 sudo apt-get update
-sudo apt-get install build-essential cmake libglfw3-dev libgl1-mesa-dev libglu1-mesa-dev
-```
+sudo apt-get install build-essential cmake libgl1-mesa-dev libx11-dev libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev
 
-2) **Сборка проекта** (из корня папки проекта):
-
-```bash
-mkdir build && cd build
-cmake ..
-make -j$(nproc)
-```
-
-3) **Запуск**
-
-```bash
-./LabApp
-```
-
----
-
-### Windows
-
-1) **В корне проекта**
-
-```cmd
-mkdir build
-cd build
-```
-
-2) **Генерация файлов сборки**
-
-```cmd
-cmake ..
-```
-
-3) **Сборка**
-
-```cmd
-cmake --build . --config Release
-```
-
-4) **Запуск**
-
-```cmd
-.\Release\LabApp.exe
+cmake -S . -B build
+cmake --build build -j"$(nproc)"
+./build/LabApp
 ```

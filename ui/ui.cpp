@@ -3,6 +3,7 @@
 #include <iostream>
 
 #include "continuity_ui.h"
+#include "approximation.h"
 #include "create_function_ui.h"
 #include "define_piece_ui.h"
 #include "evaluate_ui.h"
@@ -26,6 +27,7 @@ namespace
         std::cout << "6. Check continuity\n";
         std::cout << "7. Run tests\n";
         std::cout << "8. Build plot\n";
+        std::cout << "9. Approximate function\n";
         std::cout << "0. Exit\n";
     }
 }
@@ -77,6 +79,9 @@ void RunUi()
             break;
         case 8:
             PlotFunctionInUi(state);
+            break;
+        case 9:
+            ApproximateFunction(state);
             break;
         case 0:
             should_exit = true;

@@ -73,7 +73,7 @@ PlotData GeneratePlotPoints(const PiecewiseFunction<double, double>& func, int p
     }
     return data;
 }
-
+    
 
 void PlotFunctionInUi(UiState& state) {
     if (state.functions.empty()) {

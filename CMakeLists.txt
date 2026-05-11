@@ -3,10 +3,15 @@ project(PiecewiseLab)
 
 set(CMAKE_CXX_STANDARD 17)
 
-# Ищем GLFW (уже установлен в системе)
-find_package(glfw3 REQUIRED)
 find_package(OpenGL REQUIRED)
 find_package(Threads REQUIRED)
+
+# Build vendored GLFW instead of requiring a system glfw3 package.
+set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
+set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
+set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
+set(GLFW_INSTALL OFF CACHE BOOL "" FORCE)
+add_subdirectory(External/glfw)
 
 
 # Подключаем пути к заголовкам
@@ -15,6 +20,7 @@ include_directories(. External/imgui External/imgui/backends External/implot)
 # Собираем список всех исходников
 set(SOURCES
     ui/continuity_ui.cpp
+    ui/approximation.cpp
     ui/create_function_ui.cpp
     ui/define_piece_ui.cpp
     ui/evaluate_ui.cpp

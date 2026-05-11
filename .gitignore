@@ -58,3 +58,13 @@
 *.txt
 *.pdf
 $null
+
+# Keep vendored UI dependencies.
+!/External/
+/External/*
+!/External/imgui/
+!/External/implot/
+!/External/glfw/
+!/External/imgui/**
+!/External/implot/**
+!/External/glfw/**

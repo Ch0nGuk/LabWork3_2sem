@@ -74,7 +74,10 @@ private:
 
             const bool touches = current_interval.GetRight() == next_interval.GetLeft();
             const bool same_function_type = typeid(current.GetFunction()) == typeid(next.GetFunction());
-            if (touches && same_function_type)
+            const bool merge_allowed =
+                current.GetFunction().CanMergeWithSameType() &&
+                next.GetFunction().CanMergeWithSameType();
+            if (touches && same_function_type && merge_allowed)
             {
                 current = Piece<X, Y>(
                     Interval<X>(current_interval.GetLeft(), next_interval.GetRight()),

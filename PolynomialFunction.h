@@ -49,6 +49,11 @@ public:
         return Monotonicity::NotMonotone;
     }
 
+    bool CanMergeWithSameType() const override
+    {
+        return true;
+    }
+
     UniquePtr<IFunction<X, X>> Clone() const override
     {
         return UniquePtr<IFunction<X, X>>(new PolynomialFunction<X>(*this));
