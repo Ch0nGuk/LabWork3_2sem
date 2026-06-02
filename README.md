@@ -42,7 +42,7 @@ S_i(x) = y_i + s_i * (x - x_i) + a_i * (x - x_i)^2
 
 ## Зависимости
 
-Проект не собирает GLFW и ImGui из исходников внутри репозитория. CMake ищет системные development-пакеты:
+Для сборки графической части нужны development-пакеты с заголовками и библиотеками. CMake ищет зависимости через `find_package(...)` или `pkg-config`:
 
 - OpenGL
 - GLFW 3
@@ -50,7 +50,9 @@ S_i(x) = y_i + s_i * (x - x_i) + a_i * (x - x_i)^2
 - Threads
 - pkg-config для fallback-поиска пакетов
 
-ImPlot сначала ищется как системный пакет через CMake/pkg-config. Если системный ImPlot не установлен, CMake временно использует fallback `External/implot`, чтобы не отключать построение графиков.
+ImPlot сначала ищется как системный пакет через CMake/pkg-config. Если системный ImPlot не установлен, CMake использует локальный fallback `External/implot`.
+
+Fallback зафиксирован на версии `v0.15`: она совместима с системным `libimgui-dev` версии `1.90.1`. Более новые версии ImPlot могут использовать `ImDrawList::AddConcavePolyFilled`, которого нет в ImGui `1.90.1`.
 
 ## Windows
 
@@ -76,7 +78,7 @@ build\Release\LabApp.exe
 - C++17 compiler
 - development-пакеты GLFW, ImGui и OpenGL
 - pkg-config
-- ImPlot development package, если он доступен в репозиториях дистрибутива
+- ImPlot development package, если он доступен в репозиториях дистрибутива; иначе используется fallback `External/implot`
 
 Fedora/RHEL-подобные системы:
 
@@ -91,7 +93,6 @@ sudo apt update
 sudo apt install build-essential cmake libglfw3-dev libimgui-dev libgl1-mesa-dev pkg-config
 ```
 
-В Debian/Ubuntu стандартный пакет ImPlot может отсутствовать. В этом случае сборка использует оставленный в репозитории fallback `External/implot`; GLFW и ImGui всё равно должны быть установлены как системные development-пакеты.
 
 Сборка
 
