@@ -42,11 +42,15 @@ S_i(x) = y_i + s_i * (x - x_i) + a_i * (x - x_i)^2
 
 ## Зависимости
 
-В проекте используется vendoring зависимостей. Используемые UI-библиотеки находятся в каталоге `External/`:
+Проект не собирает GLFW и ImGui из исходников внутри репозитория. CMake ищет системные development-пакеты:
 
-- `External/imgui`
-- `External/implot`
-- `External/glfw`
+- OpenGL
+- GLFW 3
+- ImGui с GLFW/OpenGL3 backend-заголовками
+- Threads
+- pkg-config для fallback-поиска пакетов
+
+ImPlot сначала ищется как системный пакет через CMake/pkg-config. Если системный ImPlot не установлен, CMake временно использует fallback `External/implot`, чтобы не отключать построение графиков.
 
 ## Windows
 
@@ -54,6 +58,7 @@ S_i(x) = y_i + s_i * (x - x_i) + a_i * (x - x_i)^2
 
 - CMake
 - Visual Studio 2022 или Visual Studio Build Tools с компонентом C++
+- development-пакеты GLFW, ImGui, OpenGL и, желательно, ImPlot, доступные для `find_package`/pkg-config
 
 Сборка из корня проекта:
 
@@ -69,13 +74,24 @@ build\Release\LabApp.exe
 
 - CMake
 - C++17 compiler
+- development-пакеты GLFW, ImGui и OpenGL
+- pkg-config
+- ImPlot development package, если он доступен в репозиториях дистрибутива
 
-Установка зависимостей
+Fedora/RHEL-подобные системы:
 
 ```bash
-sudo apt-get update
-sudo apt-get install build-essential cmake libgl1-mesa-dev libx11-dev libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev
+sudo dnf install cmake gcc-c++ glfw-devel mesa-libGL-devel imgui-devel implot-devel pkgconf-pkg-config
 ```
+
+Debian/Ubuntu:
+
+```bash
+sudo apt update
+sudo apt install build-essential cmake libglfw3-dev libimgui-dev libgl1-mesa-dev pkg-config
+```
+
+В Debian/Ubuntu стандартный пакет ImPlot может отсутствовать. В этом случае сборка использует оставленный в репозитории fallback `External/implot`; GLFW и ImGui всё равно должны быть установлены как системные development-пакеты.
 
 Сборка
 

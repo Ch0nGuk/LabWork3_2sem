@@ -7,10 +7,22 @@
 #include <vector>
 
 #include "plot_ui.h"
-#include "imgui.h"
-#include "imgui_impl_glfw.h"
-#include "imgui_impl_opengl3.h"
-#include "implot.h"
+#include <imgui.h>
+#if __has_include(<backends/imgui_impl_glfw.h>)
+#include <backends/imgui_impl_glfw.h>
+#elif __has_include(<imgui_impl_glfw.h>)
+#include <imgui_impl_glfw.h>
+#else
+#error "ImGui GLFW backend header was not found"
+#endif
+#if __has_include(<backends/imgui_impl_opengl3.h>)
+#include <backends/imgui_impl_opengl3.h>
+#elif __has_include(<imgui_impl_opengl3.h>)
+#include <imgui_impl_opengl3.h>
+#else
+#error "ImGui OpenGL3 backend header was not found"
+#endif
+#include <implot.h>
 #include "piecewise_ui_utils.h"
 #include "PiecewiseFunction.h"
 #include "Piece.h"

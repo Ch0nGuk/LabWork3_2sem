@@ -59,12 +59,8 @@
 *.pdf
 $null
 
-# Keep vendored UI dependencies.
+# Keep the temporary vendored ImPlot fallback. GLFW and ImGui are system packages.
 !/External/
 /External/*
-!/External/imgui/
 !/External/implot/
-!/External/glfw/
-!/External/imgui/**
 !/External/implot/**
-!/External/glfw/**
